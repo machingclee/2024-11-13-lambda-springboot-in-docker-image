@@ -1,0 +1,31 @@
+service: docker-example-springboot
+
+provider:
+  name: aws
+  region: ap-northeast-1
+  stage: dev
+  iam:
+    role:
+      name: ${self:service}-${self:provider.stage}-role
+  ecr:
+    images:
+      docker-example-springboot:
+        path: ./
+
+functions:
+  api:
+    image:
+      name: docker-example-springboot
+    timeout: 900
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    events:
+      - http: ANY /
+      - http: ANY /{proxy+}
+
+custom:
+  serverless-offline:
+    useDocker: true
+
+plugins:
+  - serverless-offline
